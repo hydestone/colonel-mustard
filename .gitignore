@@ -41,3 +41,8 @@ yarn-error.log*
 next-env.d.ts
 
 .vercel
+
+# Audit and build artifacts
+audit-output.txt
+build.log
+sample dashboards/
