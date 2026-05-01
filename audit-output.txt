@@ -1,0 +1,360 @@
+
+
+=== lib directory ===
+C:\Users\John Hyde\Documents\Colonel Mustard\lib\strava.ts (145 lines)
+C:\Users\John Hyde\Documents\Colonel Mustard\lib\supabase-helpers.ts (35 lines)
+C:\Users\John Hyde\Documents\Colonel Mustard\lib\supabase.ts (9 lines)
+
+=== Environment variables referenced ===
+process.env.BOOK_LANG
+process.env.foo
+process.env.HOST
+process.env.ICEBERG_TOKEN
+process.env.NEXT_DEPLOYMENT_ID
+process.env.NEXT_PUBLIC_APP_URL
+process.env.NEXT_PUBLIC_SUPABASE_URL
+process.env.NODE_DISABLE_COLORS
+process.env.NODE_ENV
+process.env.NODE_UNIQUE_ID
+process.env.PATH
+process.env.STRAVA_CLIENT_ID
+process.env.STRAVA_CLIENT_SECRET
+process.env.SUPABASE_SECRET_KEY
+process.env.SUPABASE_SERVICE_ROLE_KEY
+process.env.TEST_DIST
+
+=== Type safety - any usage ===
+page.tsx: 8 instances of ': any'
+page.tsx: 8
+route.ts: 3
+route.ts: 1
+route.ts: 2
+route.ts: 1
+route.ts: 2
+route.ts: 1
+route.ts: 6
+route.ts: 4
+PeakPerformance.tsx: 1
+TrainingZones.tsx: 1
+page.tsx: 8
+
+=== Hook complexity in page.tsx ===
+useState count: 40
+useEffect count: 3
+async function count: 8
+
+=== Console statements ===
+route.ts:32: console.error("Token exchange failed:", text);
+route.ts:53: console.error("Database error:", dbError);
+route.ts:68: console.error("Callback error:", err);
+route.ts:56: console.error("Sync database error:", dbError);
+route.ts:69: console.error("Sync error:", err);
+strava.ts:133: console.warn("Hit 20 page limit, stopping pagination");
+
+=== Data fetching patterns - parallelism ===
+L132: fetch("/api/me").then(r => r.json()).then(data => {
+L133: if (data.authenticated) { setAuthenticated(true); setAthleteId(data.athleteId); if (data.athlete) setAthleteName(data.athlete.firstname || ""); loadAl
+L141: const res = await fetch(`/api/activities/list?page=1&limit=200&type=${type}&sort=start_date_local&dir=desc`);
+L147: async function loadAllData() { setChartLoading(true); await Promise.all([loadYoY(), loadPMC(), loadOverview(), loadPowerProfile()]); setChartLoading(f
+L149: const res = await fetch("/api/activities/yearly"); const data = await res.json();
+L155: const res = await fetch("/api/activities/power-profile");
+L160: async function loadPMC() { const res = await fetch("/api/activities/pmc"); const data = await res.json(); setPmcData(data.pmc || []); setCurrentCTL(da
+L162: const res = await fetch("/api/activities/overview"); const data = await res.json(); setCalendar(data.calendar || []); setSummary(data.summary || {}); 
+L174: const res = await fetch(url); const data = await res.json();
+L188: const res = await fetch("/api/sync", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ athleteId, fullSync }) 
+L196: if (tab === "heatmap" && heatmapData.length === 0) { setHeatmapLoading(true); fetch("/api/activities/heatmap").then(r => r.json()).then(d => { setHeat
+
+=== Caching headers and strategies ===
+route.ts:14: // Check cache first
+route.ts:17: const { data: cached } = await supabase.from("api_cache").select("data, expires_at").eq("cache_key", `gear_names_${athleteId}`).single();
+route.ts:18: if (cached && new Date(cached.expires_at) > new Date()) return NextResponse.json(cached.data);
+route.ts:50: // Cache for 24 hours
+route.ts:53: await supabase.from("api_cache").upsert({ cache_key: `gear_names_${athleteId}`, data: { names }, expires_at: expires.toISOString() }, { onConflict: "cache_key" });
+route.ts:7: const CACHE_HOURS = 6;
+route.ts:9: async function getCache(key: string) {
+route.ts:12: const { data } = await supabase.from("api_cache").select("data, expires_at").eq("cache_key", key).single();
+route.ts:17: async function setCache(key: string, value: any) {
+route.ts:20: const expires = new Date(); expires.setHours(expires.getHours() + CACHE_HOURS);
+route.ts:21: await supabase.from("api_cache").upsert({ cache_key: key, data: value, expires_at: expires.toISOString() }, { onConflict: "cache_key" });
+route.ts:30: const cacheKey = `segments_v2_${athleteId}`;
+route.ts:31: const cached = await getCache(cacheKey);
+route.ts:32: if (cached) return NextResponse.json(cached);
+route.ts:109: await setCache(cacheKey, result);
+
+=== Database query patterns ===
+route.ts:10: 1 queries
+route.ts:12: 1 queries
+route.ts:13: 1 queries
+route.ts:14: 1 queries
+route.ts:15: 1 queries
+route.ts:16: 1 queries
+route.ts:17: 1 queries
+route.ts:21: 1 queries
+route.ts:22: 1 queries
+route.ts:23: 1 queries
+route.ts:24: 1 queries
+route.ts:29: 1 queries
+route.ts:3: 1 queries
+route.ts:36: 1 queries
+route.ts:43: 1 queries
+route.ts:5: 1 queries
+route.ts:50: 1 queries
+route.ts:53: 1 queries
+
+=== Error handling - try/catch coverage ===
+route.ts: 6 awaits, 0 try blocks, 0 catches
+route.ts: 7 awaits, 4 try blocks, 4 catches
+route.ts: 2 awaits, 0 try blocks, 0 catches
+route.ts: 2 awaits, 0 try blocks, 0 catches
+route.ts: 6 awaits, 2 try blocks, 2 catches
+route.ts: 4 awaits, 0 try blocks, 0 catches
+route.ts: 2 awaits, 0 try blocks, 0 catches
+route.ts: 5 awaits, 0 try blocks, 0 catches
+route.ts: 13 awaits, 4 try blocks, 4 catches
+route.ts: 2 awaits, 0 try blocks, 0 catches
+route.ts: 2 awaits, 0 try blocks, 0 catches
+route.ts: 4 awaits, 1 try blocks, 1 catches
+route.ts: 2 awaits, 0 try blocks, 0 catches
+route.ts: 5 awaits, 1 try blocks, 1 catches
+TrainingZones.tsx: 2 awaits, 0 try blocks, 0 catches
+page.tsx: 11 awaits, 0 try blocks, 0 catches
+
+=== Empty catch blocks (silent failures) ===
+route.ts:19: } catch {}
+route.ts:54: } catch {}
+route.ts:89: } catch {}
+route.ts:14: } catch {}
+route.ts:22: } catch {}
+route.ts:71: } catch {}
+route.ts:83: } catch {}
+
+=== Loading and error states in UI ===
+Loading states: 6 references in page.tsx
+Error UI: 1 references
+
+=== Auth and cookies ===
+route.ts:8: const cookieStore = await cookies();
+route.ts:10: const cookieStore = await cookies();
+route.ts:6: const cookieStore = await cookies();
+route.ts:8: const cookieStore = await cookies();
+route.ts:9: const cookieStore = await cookies();
+route.ts:6: const cookieStore = await cookies();
+route.ts:36: const cookieStore = await cookies();
+route.ts:6: const cookieStore = await cookies();
+route.ts:26: const cookieStore = await cookies();
+route.ts:8: const cookieStore = await cookies();
+route.ts:6: const cookieStore = await cookies();
+route.ts:7: httpOnly: true,
+route.ts:8: secure: process.env.NODE_ENV === "production",
+route.ts:9: sameSite: "lax",
+route.ts:59: httpOnly: true,
+
+=== Input validation ===
+route.ts:13: const activityId = searchParams.get("id");
+route.ts:16: const token = await getValidToken(parseInt(athleteId));
+route.ts:25: [{ column: "athlete_id", value: parseInt(athleteId) }]
+route.ts:32: const token = await getValidToken(parseInt(athleteId));
+route.ts:13: [{ column: "athlete_id", value: parseInt(athleteId) }]
+route.ts:13: const page = parseInt(searchParams.get("page") || "1");
+route.ts:14: const limit = parseInt(searchParams.get("limit") || "50");
+route.ts:15: const type = searchParams.get("type") || "";
+route.ts:16: const sort = searchParams.get("sort") || "start_date_local";
+route.ts:17: const dir = searchParams.get("dir") || "desc";
+route.ts:25: .eq("athlete_id", parseInt(athleteId));
+route.ts:16: [{ column: "athlete_id", value: parseInt(athleteId) }],
+route.ts:82: const token = await getValidToken(parseInt(athleteId));
+route.ts:11: const aid = parseInt(athleteId);
+route.ts:46: [{ column: "athlete_id", value: parseInt(athleteId) }],
+route.ts:24: .eq("athlete_id", parseInt(athleteId)).eq("type", "Run")
+route.ts:51: .eq("athlete_id", parseInt(athleteId)).eq("type", "Ride")
+route.ts:34: const token = await getValidToken(parseInt(athleteId));
+route.ts:18: [{ column: "athlete_id", value: parseInt(athleteId) }],
+route.ts:11: const range = searchParams.get("range") || "3m";
+
+=== Hardcoded secrets check ===
+.env.local exists: True
+.env in gitignore: True
+
+=== Responsive design - viewport queries ===
+Responsive references: 0
+
+=== Touch and accessibility ===
+aria-* attrs: 0
+role= attrs: 0
+alt= on images: 0
+tabIndex: 0
+
+=== Empty states / no-data UI ===
+page.tsx:16: if (data.length === 0) return [];
+page.tsx:27: if (hist.length === 0) return null;
+page.tsx:81: <div style={{ fontSize: 20, color: i === 0 ? AC : "#e8e8e8", fontWeight: 500, marginTop: 4 }}>{value
+HeatmapMap.tsx:31: if (!mapRef.current || polylines.length === 0) return;
+PeakPerformance.tsx:9: if (rows.length === 0) return null;
+RouteMap.tsx:16: if (!mapRef.current || route.length === 0) return;
+Segments.tsx:28: if (segments.length === 0) return <div style={{ background: "rgba(255,255,255,0.05)", backdropFilter
+page.tsx:41: if (data.length === 0) return null;
+page.tsx:46: if (dist === 0) return "#161616";
+page.tsx:57: const filteredMonthLabels = monthLabels.filter((ml, i, arr) => i === 0 || (ml.week - arr[i-1].week) 
+page.tsx:195: if (tab === "activities" && actList.length === 0) loadActivities();
+page.tsx:196: if (tab === "heatmap" && heatmapData.length === 0) { setHeatmapLoading(true); fetch("/api/activities
+page.tsx:269: {displayYears.map((year, i) => visibleYears.has(year) ? <Line key={year} type="monotone" dataKey={`$
+
+=== Sync route logic ===
+import { NextRequest, NextResponse } from "next/server";
+import { getSupabaseAdmin } from "@/lib/supabase";
+import {
+  getValidToken,
+  fetchAllActivities,
+  mapActivityToRow,
+} from "@/lib/strava";
+
+export async function POST(request: NextRequest) {
+  try {
+    const body = await request.json();
+    const { athleteId, fullSync = false } = body;
+
+    if (!athleteId) {
+      return NextResponse.json(
+        { error: "athleteId is required" },
+        { status: 400 }
+      );
+    }
+
+    const accessToken = await getValidToken(athleteId);
+    const supabase = getSupabaseAdmin();
+
+    let after: number | undefined;
+
+    if (!fullSync) {
+      const { data: latest } = await supabase
+        .from("activities")
+        .select("start_date")
+        .eq("athlete_id", athleteId)
+        .order("start_date", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (latest?.start_date) {
+        after = Math.floor(new Date(latest.start_date).getTime() / 1000) - 86400;
+      }
+    }
+
+    const activities = await fetchAllActivities(accessToken, after);
+
+    if (activities.length === 0) {
+      return NextResponse.json({
+        message: "No new activities found",
+        count: 0,
+      });
+    }
+
+    const rows = activities.map((a) => mapActivityToRow(a, athleteId));
+
+    const { error: dbError } = await supabase
+      .from("activities")
+      .upsert(rows, { onConflict: "id" });
+
+    if (dbError) {
+      console.error("Sync database error:", dbError);
+      return NextResponse.json(
+        { error: "Failed to save activities", details: dbError.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      message: `Synced ${activities.length} activities`,
+      count: activities.length,
+      mode: fullSync ? "full" : "incremental",
+    });
+  } catch (err) {
+    console.error("Sync error:", err);
+    return NextResponse.json(
+      { error: err instanceof Error ? err.message : "Sync failed" },
+      { status: 500 }
+    );
+  }
+}
+
+=== Schema reference points ===
+.from("activities")
+.from("api_cache")
+.from("strava_tokens")
+
+=== Live deployed API health ===
+me -> 
+activities/overview -> 
+activities/yearly -> 
+activities/pmc -> 
+activities/list?page=1&limit=5 -> 
+
+=== Live API: gear data still broken? ===
+id=b1054970 name=b1054970 (broken if same)
+id=b11993052 name=b11993052 (broken if same)
+id=b1054967 name=b1054967 (broken if same)
+
+=== Live API: cache table populated? ===
+Run in Supabase SQL Editor: SELECT cache_key, expires_at FROM api_cache;
+(paste result manually)
+
+=== Build artifacts ===
+node_modules size: 445 MB
+.next exists: True
+build.log exists: True
+
+=== TypeScript config strictness ===
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "**/*.mts"
+  ],
+  "exclude": ["node_modules"]
+}
+
+=== Git status check ===
+ M .gitignore
+ M app/globals.css
+ M app/layout.tsx
+ M app/page.tsx
+ M package-lock.json
+ M package.json
+?? app/activity/
+?? app/api/
+?? app/components/
+?? audit-output.txt
+?? build.log
+?? deploy.bat
+?? lib/
+?? public/icon-192.png
+?? public/icon-512.png
+?? public/manifest.json
+?? "sample dashboards/"
+Git log last 5: 
+a8af222 Initial commit from Create Next App
