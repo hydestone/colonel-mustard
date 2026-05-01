@@ -60,6 +60,34 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Q4: Invalidate activity-derived caches.
+    // Activities just changed, so any cache computed from activities is stale.
+    // Currently only gear-names and segments routes write to api_cache; other
+    // endpoints (overview, peaks, pmc, yearly, etc.) compute live from the DB
+    // and do not cache. If new caches are added, append their keys here.
+    // Important: do NOT match 'strava_cooldown' (no athlete suffix, system row).
+    // Non-blocking: cache invalidation failure does not fail the sync, since
+    // the activities are already saved successfully.
+    try {
+      const cacheKeysToInvalidate = [
+        `gear_names_${athleteId}`,
+        `segments_v2_${athleteId}`,
+      ];
+      const { error: cacheError, count } = await supabase
+        .from("api_cache")
+        .delete({ count: "exact" })
+        .in("cache_key", cacheKeysToInvalidate);
+      if (cacheError) {
+        console.error("[sync] Cache invalidation error:", cacheError);
+      } else {
+        console.log(
+          `[sync] Invalidated ${count ?? 0} cache rows for athlete ${athleteId} after upserting ${activities.length} activities`
+        );
+      }
+    } catch (cacheErr) {
+      console.error("[sync] Cache invalidation threw:", cacheErr);
+    }
+
     return NextResponse.json({
       message: `Synced ${activities.length} activities`,
       count: activities.length,
