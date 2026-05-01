@@ -2,6 +2,10 @@
 import { NextResponse } from "next/server";
 import { getValidToken } from "@/lib/strava";
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { logError } from "@/lib/log";
+import { logError } from "@/lib/log";
+import { logError } from "@/lib/log";
+import { logError } from "@/lib/log";
 
 const STRAVA_API = "https://www.strava.com/api/v3";
 const CACHE_HOURS = 6;
@@ -11,7 +15,7 @@ async function getCache(key: string) {
     const supabase = getSupabaseAdmin();
     const { data } = await supabase.from("api_cache").select("data, expires_at").eq("cache_key", key).single();
     if (data && new Date(data.expires_at) > new Date()) return data.data;
-  } catch {}
+  } catch (e: any) { if (e?.code !== "PGRST116") logError({ context: "segments:cache-read", error: e, metadata: { cacheKey: key } }); }
   return null;
 }
 async function setCache(key: string, value: any) {
@@ -19,7 +23,7 @@ async function setCache(key: string, value: any) {
     const supabase = getSupabaseAdmin();
     const expires = new Date(); expires.setHours(expires.getHours() + CACHE_HOURS);
     await supabase.from("api_cache").upsert({ cache_key: key, data: value, expires_at: expires.toISOString() }, { onConflict: "cache_key" });
-  } catch {}
+  } catch (e) { logError({ context: "segments:cache-write", error: e, metadata: { cacheKey: key } }); }
 }
 
 export async function GET() {
@@ -68,7 +72,7 @@ export async function GET() {
             prDate = new Date(best.start_date_local).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
           }
         }
-      } catch {}
+      } catch (e) { logError({ context: "segments:fetch-efforts", error: e, athleteId: parseInt(athleteId), metadata: { segmentId: seg.id } }); }
 
       // Fetch leaderboard for rank
       try {
@@ -80,7 +84,7 @@ export async function GET() {
             rank = lb.athlete_entries[0].rank;
           }
         }
-      } catch {}
+      } catch (e) { logError({ context: "segments:fetch-leaderboard", error: e, athleteId: parseInt(athleteId), metadata: { segmentId: seg.id } }); }
 
       return {
         id: seg.id, name: seg.name,

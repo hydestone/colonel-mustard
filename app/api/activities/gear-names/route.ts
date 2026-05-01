@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { getValidToken } from "@/lib/strava";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { fetchAllRows } from "@/lib/supabase-helpers";
+import { logError } from "@/lib/log";
+import { logError } from "@/lib/log";
 
 const STRAVA_API = "https://www.strava.com/api/v3";
 
@@ -16,7 +18,7 @@ export async function GET() {
   try {
     const { data: cached } = await supabase.from("api_cache").select("data, expires_at").eq("cache_key", `gear_names_${athleteId}`).single();
     if (cached && new Date(cached.expires_at) > new Date()) return NextResponse.json(cached.data);
-  } catch {}
+  } catch (e: any) { if (e?.code !== "PGRST116") logError({ context: "gear-names:cache-read", error: e, athleteId: parseInt(athleteId) }); }
 
   // Get all unique gear IDs from activities
   const activities = await fetchAllRows(
@@ -51,7 +53,7 @@ export async function GET() {
   try {
     const expires = new Date(); expires.setHours(expires.getHours() + 24);
     await supabase.from("api_cache").upsert({ cache_key: `gear_names_${athleteId}`, data: { names }, expires_at: expires.toISOString() }, { onConflict: "cache_key" });
-  } catch {}
+  } catch (e) { logError({ context: "gear-names:cache-write", error: e, athleteId: parseInt(athleteId) }); }
 
   return NextResponse.json({ names });
 }

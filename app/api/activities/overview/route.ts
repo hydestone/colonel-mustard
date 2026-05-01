@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 import { fetchAllRows } from "@/lib/supabase-helpers";
 import { getValidToken } from "@/lib/strava";
+import { logError } from "@/lib/log";
 
 const STRAVA_API = "https://www.strava.com/api/v3";
 
@@ -86,7 +87,7 @@ export async function GET() {
         try {
           const res = await fetch(`${STRAVA_API}/gear/${gid}`, { headers: { Authorization: `Bearer ${token}` } });
           if (res.ok) { const data = await res.json(); return { id: gid, name: data.name || gid, retired: data.retired || false }; }
-        } catch {}
+        } catch (e) { logError({ context: "overview:fetch-gear-detail", error: e, athleteId: parseInt(athleteId), metadata: { gearId: gid } }); }
         return { id: gid, name: gid, retired: false };
       })
     );
