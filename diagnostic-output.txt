@@ -1,0 +1,41 @@
+
+
+=== Local catch blocks - segments/route.ts ===
+L5: import { logError } from "@/lib/log";
+L15: } catch (e: any) { if (e?.code !== "PGRST116") logError({ context: "segments:cache-read", error: e, metadata: { cacheKey: key } }); }
+L23: } catch (e) { logError({ context: "segments:cache-write", error: e, metadata: { cacheKey: key } }); }
+L72: } catch (e) { logError({ context: "segments:fetch-efforts", error: e, athleteId: parseInt(athleteId), metadata: { segmentId: seg.id } }); }
+L84: } catch (e) { logError({ context: "segments:fetch-leaderboard", error: e, athleteId: parseInt(athleteId), metadata: { segmentId: seg.id } }); }
+
+=== Local catch blocks - gear-names/route.ts ===
+L6: import { logError } from "@/lib/log";
+L20: } catch (e: any) { if (e?.code !== "PGRST116") logError({ context: "gear-names:cache-read", error: e, athleteId: parseInt(athleteId) }); }
+L43: } catch {
+L47: } catch {
+L55: } catch (e) { logError({ context: "gear-names:cache-write", error: e, athleteId: parseInt(athleteId) }); }
+
+=== Local catch blocks - overview/route.ts ===
+L5: import { logError } from "@/lib/log";
+L90: } catch (e) { logError({ context: "overview:fetch-gear-detail", error: e, athleteId: parseInt(athleteId), metadata: { gearId: gid } }); }
+L101: } catch {
+
+=== Live overview endpoint (15s timeout) ===
+Size: 23968 bytes
+GearList count: 18
+First 5 gears:
+  b1054970 -> b1054970
+  b11993052 -> b11993052
+  b1054967 -> b1054967
+  b9693757 -> b9693757
+  b10513157 -> b10513157
+
+=== Live gear-names endpoint (15s timeout) ===
+Size: 411 bytes
+Body: {"names":{"g345777":"g345777","g447559":"g447559","b1004360":"b1004360","b1054967":"b1054967","b1054970":"b1054970","b1848010":"b1848010","b2553783":"b2553783","b9693757":"b9693757","g2254423":"g2254423","g2254424":"g2254424","g2605537":"g2605537","g4190490":"g4190490","g4260040":"g4260040","g7873907":"g7873907","b10513157":"b10513157","b11993052":"b11993052","g11024336":"g11024336","g21452168":"g21452168"}}
+
+=== Live /api/log probe ===
+Response: {"ok":false}
+
+=== DONE - paste these SQL queries in Supabase ===
+SELECT created_at, context, message, source, metadata FROM errors WHERE created_at > NOW() - INTERVAL '10 minutes' ORDER BY created_at DESC;
+SELECT jsonb_pretty(data::jsonb) FROM api_cache WHERE cache_key = 'gear_names_1532047';

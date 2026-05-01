@@ -98,7 +98,7 @@ export async function GET() {
       count: gearTotals[g.id].count,
       lastUsed: gearTotals[g.id].lastUsed.split("T")[0],
     })).sort((a, b) => b.distance - a.distance);
-  } catch {
+  } catch (e) { logError({ context: "overview:gear-list-fallback", error: e, athleteId: parseInt(athleteId) });
     gearList = Object.entries(gearTotals).map(([gid, data]) => ({
       id: gid, name: gid, retired: false,
       distance: Math.round(data.distance / 1609.34),
