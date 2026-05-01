@@ -3,9 +3,6 @@ import { NextResponse } from "next/server";
 import { getValidToken } from "@/lib/strava";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { logError } from "@/lib/log";
-import { logError } from "@/lib/log";
-import { logError } from "@/lib/log";
-import { logError } from "@/lib/log";
 
 const STRAVA_API = "https://www.strava.com/api/v3";
 const CACHE_HOURS = 6;

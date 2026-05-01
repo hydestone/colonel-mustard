@@ -4,7 +4,6 @@ import { getValidToken } from "@/lib/strava";
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { fetchAllRows } from "@/lib/supabase-helpers";
 import { logError } from "@/lib/log";
-import { logError } from "@/lib/log";
 
 const STRAVA_API = "https://www.strava.com/api/v3";
 
